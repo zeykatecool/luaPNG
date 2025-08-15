@@ -1,0 +1,131 @@
+Starting FFI PNG benchmark
+[FFI] Test 1: 1000x1000 rgb, total pixels 3000000, approx mem 22.89 MB
+[FFI] EncodeTime: 0.0290 sec, FileSize: 3001293 bytes (2.86 MB), WriteSpeed: 98.70 MB/s, Status: OK
+[FFI] Test 2: 1000x1000 rgba, total pixels 4000000, approx mem 30.52 MB
+[FFI] EncodeTime: 0.0360 sec, FileSize: 4001373 bytes (3.82 MB), WriteSpeed: 106.00 MB/s, Status: OK
+[FFI] Test 3: 1000x1500 rgb, total pixels 4500000, approx mem 34.33 MB
+[FFI] EncodeTime: 0.0400 sec, FileSize: 4501908 bytes (4.29 MB), WriteSpeed: 107.33 MB/s, Status: OK
+[FFI] Test 4: 1000x1500 rgba, total pixels 6000000, approx mem 45.78 MB
+[FFI] EncodeTime: 0.0810 sec, FileSize: 6002023 bytes (5.72 MB), WriteSpeed: 70.67 MB/s, Status: OK
+[FFI] Test 5: 1000x2000 rgb, total pixels 6000000, approx mem 45.78 MB
+[FFI] EncodeTime: 0.0750 sec, FileSize: 6002523 bytes (5.72 MB), WriteSpeed: 76.33 MB/s, Status: OK
+[FFI] Test 6: 1000x2000 rgba, total pixels 8000000, approx mem 61.04 MB
+[FFI] EncodeTime: 0.0870 sec, FileSize: 8002678 bytes (7.63 MB), WriteSpeed: 87.72 MB/s, Status: OK
+[FFI] Test 7: 1000x2500 rgb, total pixels 7500000, approx mem 57.22 MB
+[FFI] EncodeTime: 0.0920 sec, FileSize: 7503138 bytes (7.16 MB), WriteSpeed: 77.78 MB/s, Status: OK
+[FFI] Test 8: 1000x2500 rgba, total pixels 10000000, approx mem 76.29 MB
+[FFI] EncodeTime: 0.0980 sec, FileSize: 10003328 bytes (9.54 MB), WriteSpeed: 97.35 MB/s, Status: OK
+[FFI] Test 9: 1500x1000 rgb, total pixels 4500000, approx mem 34.33 MB
+[FFI] EncodeTime: 0.0420 sec, FileSize: 4501408 bytes (4.29 MB), WriteSpeed: 102.21 MB/s, Status: OK
+[FFI] Test 10: 1500x1000 rgba, total pixels 6000000, approx mem 45.78 MB
+[FFI] EncodeTime: 0.0790 sec, FileSize: 6001523 bytes (5.72 MB), WriteSpeed: 72.45 MB/s, Status: OK
+[FFI] Test 11: 1500x1500 rgb, total pixels 6750000, approx mem 51.50 MB
+[FFI] EncodeTime: 0.0600 sec, FileSize: 6752083 bytes (6.44 MB), WriteSpeed: 107.32 MB/s, Status: OK
+[FFI] Test 12: 1500x1500 rgba, total pixels 9000000, approx mem 68.66 MB
+[FFI] EncodeTime: 0.1060 sec, FileSize: 9002253 bytes (8.59 MB), WriteSpeed: 80.99 MB/s, Status: OK
+[FFI] Test 13: 1500x2000 rgb, total pixels 9000000, approx mem 68.66 MB
+[FFI] EncodeTime: 0.1020 sec, FileSize: 9002753 bytes (8.59 MB), WriteSpeed: 84.17 MB/s, Status: OK
+[FFI] Test 14: 1500x2000 rgba, total pixels 12000000, approx mem 91.55 MB
+[FFI] EncodeTime: 0.2130 sec, FileSize: 12002983 bytes (11.45 MB), WriteSpeed: 53.74 MB/s, Status: OK
+[FFI] Test 15: 1500x2500 rgb, total pixels 11250000, approx mem 85.83 MB
+[FFI] EncodeTime: 0.2620 sec, FileSize: 11253423 bytes (10.73 MB), WriteSpeed: 40.96 MB/s, Status: OK
+[FFI] Test 16: 1500x2500 rgba, total pixels 15000000, approx mem 114.44 MB
+[FFI] EncodeTime: 0.1440 sec, FileSize: 15003708 bytes (14.31 MB), WriteSpeed: 99.37 MB/s, Status: OK
+[FFI] Test 17: 2000x1000 rgb, total pixels 6000000, approx mem 45.78 MB
+[FFI] EncodeTime: 0.0460 sec, FileSize: 6001523 bytes (5.72 MB), WriteSpeed: 124.42 MB/s, Status: OK
+[FFI] Test 18: 2000x1000 rgba, total pixels 8000000, approx mem 61.04 MB
+[FFI] EncodeTime: 0.1240 sec, FileSize: 8001678 bytes (7.63 MB), WriteSpeed: 61.54 MB/s, Status: OK
+[FFI] Test 19: 2000x1500 rgb, total pixels 9000000, approx mem 68.66 MB
+[FFI] EncodeTime: 0.0840 sec, FileSize: 9002253 bytes (8.59 MB), WriteSpeed: 102.20 MB/s, Status: OK
+[FFI] Test 20: 2000x1500 rgba, total pixels 12000000, approx mem 91.55 MB
+[FFI] EncodeTime: 0.1140 sec, FileSize: 12002483 bytes (11.45 MB), WriteSpeed: 100.41 MB/s, Status: OK
+[FFI] Test 21: 2000x2000 rgb, total pixels 12000000, approx mem 91.55 MB
+[FFI] EncodeTime: 0.1200 sec, FileSize: 12002983 bytes (11.45 MB), WriteSpeed: 95.39 MB/s, Status: OK
+[FFI] Test 22: 2000x2000 rgba, total pixels 16000000, approx mem 122.07 MB
+[FFI] EncodeTime: 0.1950 sec, FileSize: 16003288 bytes (15.26 MB), WriteSpeed: 78.27 MB/s, Status: OK
+[FFI] Test 23: 2000x2500 rgb, total pixels 15000000, approx mem 114.44 MB
+[FFI] EncodeTime: 0.1430 sec, FileSize: 15003708 bytes (14.31 MB), WriteSpeed: 100.06 MB/s, Status: OK
+[FFI] Test 24: 2000x2500 rgba, total pixels 20000000, approx mem 152.59 MB
+[FFI] EncodeTime: 0.2180 sec, FileSize: 20004093 bytes (19.08 MB), WriteSpeed: 87.51 MB/s, Status: OK
+[FFI] Test 25: 2500x1000 rgb, total pixels 7500000, approx mem 57.22 MB
+[FFI] EncodeTime: 0.0500 sec, FileSize: 7501638 bytes (7.15 MB), WriteSpeed: 143.08 MB/s, Status: OK
+[FFI] Test 26: 2500x1000 rgba, total pixels 10000000, approx mem 76.29 MB
+[FFI] EncodeTime: 0.1300 sec, FileSize: 10001828 bytes (9.54 MB), WriteSpeed: 73.37 MB/s, Status: OK
+[FFI] Test 27: 2500x1500 rgb, total pixels 11250000, approx mem 85.83 MB
+[FFI] EncodeTime: 0.1090 sec, FileSize: 11252423 bytes (10.73 MB), WriteSpeed: 98.45 MB/s, Status: OK
+[FFI] Test 28: 2500x1500 rgba, total pixels 15000000, approx mem 114.44 MB
+[FFI] EncodeTime: 0.1360 sec, FileSize: 15002708 bytes (14.31 MB), WriteSpeed: 105.20 MB/s, Status: OK
+[FFI] Test 29: 2500x2000 rgb, total pixels 15000000, approx mem 114.44 MB
+[FFI] EncodeTime: 0.1450 sec, FileSize: 15003208 bytes (14.31 MB), WriteSpeed: 98.68 MB/s, Status: OK
+[FFI] Test 30: 2500x2000 rgba, total pixels 20000000, approx mem 152.59 MB
+[FFI] EncodeTime: 0.1840 sec, FileSize: 20003593 bytes (19.08 MB), WriteSpeed: 103.68 MB/s, Status: OK
+[FFI] Test 31: 2500x2500 rgb, total pixels 18750000, approx mem 143.05 MB
+[FFI] EncodeTime: 0.1910 sec, FileSize: 18753998 bytes (17.89 MB), WriteSpeed: 93.64 MB/s, Status: OK
+[FFI] Test 32: 2500x2500 rgba, total pixels 25000000, approx mem 190.73 MB
+[FFI] EncodeTime: 0.3040 sec, FileSize: 25004473 bytes (23.85 MB), WriteSpeed: 78.44 MB/s, Status: OK
+Starting Pure Lua PNG benchmark
+[LUA] Test 1: 1000x1000 rgb, total pixels 3000000, approx mem 22.89 MB
+[LUA] EncodeTime: 0.0550 sec, FileSize: 3001293 bytes (2.86 MB), WriteSpeed: 52.04 MB/s, Status: OK
+[LUA] Test 2: 1000x1000 rgba, total pixels 4000000, approx mem 30.52 MB
+[LUA] EncodeTime: 0.0710 sec, FileSize: 4001373 bytes (3.82 MB), WriteSpeed: 53.75 MB/s, Status: OK
+[LUA] Test 3: 1000x1500 rgb, total pixels 4500000, approx mem 34.33 MB
+[LUA] EncodeTime: 0.0840 sec, FileSize: 4501908 bytes (4.29 MB), WriteSpeed: 51.11 MB/s, Status: OK
+[LUA] Test 4: 1000x1500 rgba, total pixels 6000000, approx mem 45.78 MB
+[LUA] EncodeTime: 0.1520 sec, FileSize: 6002023 bytes (5.72 MB), WriteSpeed: 37.66 MB/s, Status: OK
+[LUA] Test 5: 1000x2000 rgb, total pixels 6000000, approx mem 45.78 MB
+[LUA] EncodeTime: 0.1210 sec, FileSize: 6002523 bytes (5.72 MB), WriteSpeed: 47.31 MB/s, Status: OK
+[LUA] Test 6: 1000x2000 rgba, total pixels 8000000, approx mem 61.04 MB
+[LUA] EncodeTime: 0.1310 sec, FileSize: 8002678 bytes (7.63 MB), WriteSpeed: 58.26 MB/s, Status: OK
+[LUA] Test 7: 1000x2500 rgb, total pixels 7500000, approx mem 57.22 MB
+[LUA] EncodeTime: 0.1510 sec, FileSize: 7503138 bytes (7.16 MB), WriteSpeed: 47.39 MB/s, Status: OK
+[LUA] Test 8: 1000x2500 rgba, total pixels 10000000, approx mem 76.29 MB
+[LUA] EncodeTime: 0.1700 sec, FileSize: 10003328 bytes (9.54 MB), WriteSpeed: 56.12 MB/s, Status: OK
+[LUA] Test 9: 1500x1000 rgb, total pixels 4500000, approx mem 34.33 MB
+[LUA] EncodeTime: 0.1310 sec, FileSize: 4501408 bytes (4.29 MB), WriteSpeed: 32.77 MB/s, Status: OK
+[LUA] Test 10: 1500x1000 rgba, total pixels 6000000, approx mem 45.78 MB
+[LUA] EncodeTime: 0.1480 sec, FileSize: 6001523 bytes (5.72 MB), WriteSpeed: 38.67 MB/s, Status: OK
+[LUA] Test 11: 1500x1500 rgb, total pixels 6750000, approx mem 51.50 MB
+[LUA] EncodeTime: 0.1460 sec, FileSize: 6752083 bytes (6.44 MB), WriteSpeed: 44.10 MB/s, Status: OK
+[LUA] Test 12: 1500x1500 rgba, total pixels 9000000, approx mem 68.66 MB
+[LUA] EncodeTime: 0.2420 sec, FileSize: 9002253 bytes (8.59 MB), WriteSpeed: 35.48 MB/s, Status: OK
+[LUA] Test 13: 1500x2000 rgb, total pixels 9000000, approx mem 68.66 MB
+[LUA] EncodeTime: 0.2500 sec, FileSize: 9002753 bytes (8.59 MB), WriteSpeed: 34.34 MB/s, Status: OK
+[LUA] Test 14: 1500x2000 rgba, total pixels 12000000, approx mem 91.55 MB
+[LUA] EncodeTime: 0.2710 sec, FileSize: 12002983 bytes (11.45 MB), WriteSpeed: 42.24 MB/s, Status: OK
+[LUA] Test 15: 1500x2500 rgb, total pixels 11250000, approx mem 85.83 MB
+[LUA] EncodeTime: 0.2050 sec, FileSize: 11253423 bytes (10.73 MB), WriteSpeed: 52.35 MB/s, Status: OK
+[LUA] Test 16: 1500x2500 rgba, total pixels 15000000, approx mem 114.44 MB
+[LUA] EncodeTime: 0.6930 sec, FileSize: 15003708 bytes (14.31 MB), WriteSpeed: 20.65 MB/s, Status: OK
+[LUA] Test 17: 2000x1000 rgb, total pixels 6000000, approx mem 45.78 MB
+[LUA] EncodeTime: 0.1760 sec, FileSize: 6001523 bytes (5.72 MB), WriteSpeed: 32.52 MB/s, Status: OK
+[LUA] Test 18: 2000x1000 rgba, total pixels 8000000, approx mem 61.04 MB
+[LUA] EncodeTime: 0.0000 sec, FileSize: 0 bytes (0.00 MB), WriteSpeed: 0.00 MB/s, Status: ERROR: .\lib\png.lua:56: too many results to unpack
+[LUA] Test 19: 2000x1500 rgb, total pixels 9000000, approx mem 68.66 MB
+[LUA] EncodeTime: 0.2660 sec, FileSize: 9002253 bytes (8.59 MB), WriteSpeed: 32.28 MB/s, Status: OK
+[LUA] Test 20: 2000x1500 rgba, total pixels 12000000, approx mem 91.55 MB
+[LUA] EncodeTime: 0.0000 sec, FileSize: 0 bytes (0.00 MB), WriteSpeed: 0.00 MB/s, Status: ERROR: .\lib\png.lua:56: too many results to unpack
+[LUA] Test 21: 2000x2000 rgb, total pixels 12000000, approx mem 91.55 MB
+[LUA] EncodeTime: 0.2740 sec, FileSize: 12002983 bytes (11.45 MB), WriteSpeed: 41.78 MB/s, Status: OK
+[LUA] Test 22: 2000x2000 rgba, total pixels 16000000, approx mem 122.07 MB
+[LUA] EncodeTime: 0.0000 sec, FileSize: 0 bytes (0.00 MB), WriteSpeed: 0.00 MB/s, Status: ERROR: .\lib\png.lua:56: too many results to unpack
+[LUA] Test 23: 2000x2500 rgb, total pixels 15000000, approx mem 114.44 MB
+[LUA] EncodeTime: 0.2770 sec, FileSize: 15003708 bytes (14.31 MB), WriteSpeed: 51.66 MB/s, Status: OK
+[LUA] Test 24: 2000x2500 rgba, total pixels 20000000, approx mem 152.59 MB
+[LUA] EncodeTime: 0.0000 sec, FileSize: 0 bytes (0.00 MB), WriteSpeed: 0.00 MB/s, Status: ERROR: .\lib\png.lua:56: too many results to unpack
+[LUA] Test 25: 2500x1000 rgb, total pixels 7500000, approx mem 57.22 MB
+[LUA] EncodeTime: 0.1650 sec, FileSize: 7501638 bytes (7.15 MB), WriteSpeed: 43.36 MB/s, Status: OK
+[LUA] Test 26: 2500x1000 rgba, total pixels 10000000, approx mem 76.29 MB
+[LUA] EncodeTime: 0.0000 sec, FileSize: 0 bytes (0.00 MB), WriteSpeed: 0.00 MB/s, Status: ERROR: .\lib\png.lua:56: too many results to unpack
+[LUA] Test 27: 2500x1500 rgb, total pixels 11250000, approx mem 85.83 MB
+[LUA] EncodeTime: 0.2040 sec, FileSize: 11252423 bytes (10.73 MB), WriteSpeed: 52.60 MB/s, Status: OK
+[LUA] Test 28: 2500x1500 rgba, total pixels 15000000, approx mem 114.44 MB
+[LUA] EncodeTime: 0.0000 sec, FileSize: 0 bytes (0.00 MB), WriteSpeed: 0.00 MB/s, Status: ERROR: .\lib\png.lua:56: too many results to unpack
+[LUA] Test 29: 2500x2000 rgb, total pixels 15000000, approx mem 114.44 MB
+[LUA] EncodeTime: 0.2890 sec, FileSize: 15003208 bytes (14.31 MB), WriteSpeed: 49.51 MB/s, Status: OK
+[LUA] Test 30: 2500x2000 rgba, total pixels 20000000, approx mem 152.59 MB
+[LUA] EncodeTime: 0.0000 sec, FileSize: 0 bytes (0.00 MB), WriteSpeed: 0.00 MB/s, Status: ERROR: .\lib\png.lua:56: too many results to unpack
+[LUA] Test 31: 2500x2500 rgb, total pixels 18750000, approx mem 143.05 MB
+[LUA] EncodeTime: 0.3890 sec, FileSize: 18753998 bytes (17.89 MB), WriteSpeed: 45.98 MB/s, Status: OK
+[LUA] Test 32: 2500x2500 rgba, total pixels 25000000, approx mem 190.73 MB
+[LUA] EncodeTime: 0.0000 sec, FileSize: 0 bytes (0.00 MB), WriteSpeed: 0.00 MB/s, Status: ERROR: .\lib\png.lua:56: too many results to unpack
+Benchmark completed
