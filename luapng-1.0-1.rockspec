@@ -1,5 +1,5 @@
 package = "luapng"
-version = "1.0-1"  -- sürüm ve pakete göre ayarlayabilirsin
+version = "1.0-1"
 source = {
   url = "git+https://github.com/zeykatecool/luaPNG",
   md5 = ""
@@ -25,3 +25,4 @@ dependencies = {
   "lua >= 5.1",
   "bit32"
 }
+
