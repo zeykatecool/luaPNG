@@ -2,6 +2,8 @@
 - Blazingly fast PNG encoder written in LuaJIT.
 - Supports RGB and RGBA color modes.
 - Only requires `bit` library.
+- This library does **not** perform any **compression**. Output files are uncompressed PNGs.
+
 > There is a `png.lua` for independent usage,without FFI.
 
 # Usage
@@ -85,4 +87,5 @@ print("Done in: ", os.clock())
 
 ## License
 - MIT License
+
 
