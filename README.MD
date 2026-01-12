@@ -1,5 +1,5 @@
-# PNG Encoder For LuaJIT
-- Blazingly fast PNG encoder written in LuaJIT.
+# PNG Encoder For Lua and LuaJIT
+- Blazingly fast PNG encoder written in Lua.
 - Supports RGB and RGBA color modes.
 - Only requires `bit` library.
 - This library does **not** perform any **compression**. Output files are uncompressed PNGs.
@@ -82,5 +82,6 @@ print("Done in: ", os.clock())
 
 ## License
 - MIT License
+
 
 
