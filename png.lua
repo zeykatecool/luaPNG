@@ -4,6 +4,11 @@ Png.__index = Png
 local bit = require("bit32")
 local DEFLATE_MAX_BLOCK_SIZE = 65535
 
+if unpack == nil then
+    unpack = table.unpack
+end
+
+
 local crc_table = {}
 for i = 0, 255 do
     local c = i

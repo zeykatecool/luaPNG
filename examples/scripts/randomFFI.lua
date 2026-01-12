@@ -1,17 +1,11 @@
-local ffiPng = require("lib.ffipng")
-local width, height = 256, 256
-local colorMode = "rgb"
-local channels = 3
-local totalPixels = width * height * channels
+local Image = require("luaPNG.main")
 
-local pixels = {}
-for i = 1, totalPixels do
-    pixels[i] = math.random(0,255)
+local png = Image.new(256, 256, "rgb")
+
+for i = 1, 256 * 256 * 3 do
+    png.Data[i] = math.random(0, 255)
 end
 
-local png = ffiPng(width, height, colorMode)
-png:write(pixels)
-local f = io.open("../output/randomRGB.png", "wb")
-f:write(png:getData())
-f:close()
-print("Done in: ", os.clock())
+png:save("../output/randomRGB.png")
+
+print("Done in:", os.clock())

@@ -1,26 +1,22 @@
-local ffiPng = require("lib.ffipng")
+local Image = require("luaPNG.main")
 
 local width, height = 512, 512
-local colorMode = "rgb"
-local channels = 3
+local png = Image.new(width, height, "rgb")
 
 local function generateChecker(size)
-    local pixels = {}
-    for y = 0, height-1 do
-        for x = 0, width-1 do
-            local isWhite = ((x/size + y/size) % 2 == 0)
-            for c = 1, channels do
-                pixels[y*width*channels + x*channels + c] = isWhite and 255 or 0
-            end
+    for y = 0, height - 1 do
+        for x = 0, width - 1 do
+            local isWhite = ((math.floor(x / size) + math.floor(y / size)) % 2 == 0)
+            local val = isWhite and 255 or 0
+            local base = y * width * 3 + x * 3
+            png.Data[base + 1] = val
+            png.Data[base + 2] = val
+            png.Data[base + 3] = val
         end
     end
-    return pixels
 end
 
-local pixels = generateChecker(32)
-local png = ffiPng(width, height, colorMode)
-png:write(pixels)
-local f = io.open("../output/shape.png", "wb")
-f:write(png:getData())
-f:close()
-print("Done in: ", os.clock())
+generateChecker(32)
+png:save("../output/shape.png")
+
+print("Done in:", os.clock())
