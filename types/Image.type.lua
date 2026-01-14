@@ -1,0 +1,10 @@
+---@class Image
+---@field Width number Width of the image.
+---@field Height number Height of the image.
+---@field ColorMode "rgb" | "rgba" Color mode of the image.
+---@field write fun(self : Image,Pixels: number[]): boolean Writes pixels to the PNG file,expects an `Array`, returns `true` on success.
+---@field save fun(self : Image, Path: string): boolean Saves the image to a file, returns `true` on success.
+---@field Data number[] The image data,an `Array`.
+---@field add fun(self : Image, Shape: table) Adds a shape to the image.
+---@field drawLine fun(self : Image, x0: number, y0: number, x1: number, y1: number, r: number, g: number, b: number, a: number) Draws a line on the image.
+---@field setPixel fun(self : Image, x: number, y: number, r: number, g: number, b: number, a: number) Sets a pixel on the image.

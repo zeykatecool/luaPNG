@@ -1,14 +1,16 @@
-# PNG Encoder For Lua and LuaJIT
-- Blazingly fast PNG encoder written in Lua.
+# PNG Encoder and Image Raster Toolkit for Lua / LuaJIT
+- High-performance PNG encoder written in pure Lua with optional LuaJIT FFI backend.
+> LuaJIT is much faster and Lua is not recommended for production usage.
+- Provides a lightweight raster pipeline (geometry, shapes).
 - Supports RGB and RGBA color modes.
 - Only requires `bit` library.
 - This library does **not** perform any **compression**. Output files are uncompressed PNGs.
 
-> There is a `png.lua` for independent usage,without FFI.
-
 # Usage
 - Check `examples` folder for more examples.
+> `luaPNG` selects the default runner based on `(require("luaPNG.init")).UsingJIT` variable.
 ```lua
+--- Encoding standart PNG.
 local Image = require("luaPNG.init")
 
 local png = Image.new(256, 256, "rgb")
@@ -21,8 +23,24 @@ print(Image.UsingJIT)
 
 png:save("Example256x256.png")
 print("Done in: ", os.clock())
+
 ```
 
+```lua
+--- Encoding standart PNG and drawing rectangle.
+local Image = require("luaPNG.init")
+local img = Image.new(800, 600, "rgba")
+
+img:add(Geometry.Rectangle{
+    x = 0, y = 0,
+    w = 300, h = 300,
+    color = {220, 60, 60, 180}, -- RGBA
+    mode = "fill"
+})
+
+img:save("Example800x600.png")
+print("Done in:", os.clock())
+```
 
 # Benchmark
 - Check `benchmark\output\log` folder for benchmark results.
@@ -76,9 +94,6 @@ print("Done in: ", os.clock())
 ### png.lua
 - `png.lua` slows down or crashes when encoding large RGBA images.
 > LUA,2000,1000,rgba,8000000,61.04,0.0000,0,0.00,0.00,ERROR: .\lib\png.lua:56: too many results to unpack
-
-## Graphs
-- Check `benchmark\output\resultMatPlotLib.png` file for graph.
 
 ## License
 - MIT License

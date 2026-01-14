@@ -1,3 +1,8 @@
+--- This file does not use init.lua of luaPNG.
+--- It directly uses the FFI and LUA png libraries which are core files of luaPNG.
+--- This file needs to be run with LuaJIT.
+--- The results are logged to output/log/benchmark.log and output/log/benchmark.csv files.
+
 math.randomseed(os.time())
 local ffiPng = require("lib.ffipng")
 local luaPng = require("lib.png")

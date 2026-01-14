@@ -1,0 +1,3 @@
+---@class Geometry
+---@field Rectangle fun(GeometrySquare_Args : table) Returns a table containing the geometric data of a square.
+---@field Triangle fun(GeometryTriangle_Args : table) Returns a table containing the geometric data of a triangle.
