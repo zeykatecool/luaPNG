@@ -1,4 +1,4 @@
-# PNG Encoder and Image Raster Toolkit for Lua / LuaJIT
+# PNG Encoder and Raster Toolkit for Lua / LuaJIT
 - High-performance PNG encoder written in pure Lua with optional LuaJIT FFI backend.
 > LuaJIT is much faster and Lua is not recommended for production usage.
 - Provides a lightweight raster pipeline (geometry, shapes).
