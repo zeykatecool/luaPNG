@@ -5,6 +5,7 @@ local ffipng = require("lib.ffipng")
 
 if not jit then
     print("This benchmark is designed for LuaJIT")
+    os.exit(1)
 end
 
 local resolutions = {
