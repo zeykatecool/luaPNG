@@ -368,8 +368,13 @@ function ImageMethods:write(Pixels)
     return true
 end
 
+function ImageMethods:addSignature(Signature)
+    self.Signature = Signature
+    return self
+end
+
 function ImageMethods:save(Path)
-    local PNG = PNGLib(self.Width, self.Height, self.ColorMode)
+    local PNG = PNGLib(self.Width, self.Height, self.ColorMode, self.Signature)
     PNG:write(self.Data)
     local File = io.open(Path, "wb") or error("Failed to open file while saving image.")
     File:write(PNG:getData())

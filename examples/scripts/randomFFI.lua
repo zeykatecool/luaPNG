@@ -1,4 +1,4 @@
-local Image = require("luaPNG.main")
+local Image = require("luaPNG.init")
 
 local png = Image.new(256, 256, "rgb")
 

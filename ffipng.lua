@@ -2,145 +2,188 @@
 local ffi = require("ffi")
 local bit = require("bit")
 
-local Png = {}
-Png.__index = Png
+local PNG = {}
+PNG.__index = PNG
 
-local DEFLATE_MAX_BLOCK_SIZE = 65535
-local WRITE_BUFFER_SIZE = 32768
+-- Definition helpers
+local b_and, b_xor, b_shr, b_shl, b_not, b_or = bit.band, bit.bxor, bit.rshift, bit.lshift, bit.bnot, bit.bor
+local m_min, m_ceil = math.min, math.ceil
+local f_cast = ffi.cast
 
-local band, bxor, rshift, lshift, bnot, bor = bit.band, bit.bxor, bit.rshift, bit.lshift, bit.bnot, bit.bor
-local min, ceil = math.min, math.ceil
-local ffi_cast = ffi.cast
-
-local crc_table = ffi.new("uint32_t[256]")
+local CRC_LOOKUP = ffi.new("uint32_t[256]")
 for i = 0, 255 do
     local c = i
     for j = 0, 7 do
-        if band(c, 1) == 1 then
-            c = bxor(rshift(c, 1), 0xEDB88320)
+        if b_and(c, 1) == 1 then
+            c = b_xor(b_shr(c, 1), 0xEDB88320)
         else
-            c = rshift(c, 1)
+            c = b_shr(c, 1)
         end
     end
-    crc_table[i] = c
+    CRC_LOOKUP[i] = c
 end
 
-local function putBigUint32(val, buf, offset)
-    buf[offset] = band(rshift(val, 24), 0xFF)
-    buf[offset + 1] = band(rshift(val, 16), 0xFF)
-    buf[offset + 2] = band(rshift(val, 8), 0xFF)
-    buf[offset + 3] = band(val, 0xFF)
+local MAX_BLOCK = 65535
+local IO_CHUNK = 32768
+
+local function pack32(val, buf, off)
+    buf[off] = b_and(b_shr(val, 24), 0xFF)
+    buf[off + 1] = b_and(b_shr(val, 16), 0xFF)
+    buf[off + 2] = b_and(b_shr(val, 8), 0xFF)
+    buf[off + 3] = b_and(val, 0xFF)
 end
+
+local TEXT = { 0x74, 0x45, 0x58, 0x74 }
+
+local function writeTextChunk(ctx, keyword, value)
+    if value == nil then return end
+    if type(value) ~= "string" then value = tostring(value) end
+    if type(keyword) ~= "string" then keyword = tostring(keyword) end
+    local data = {}
+    local k = 1
+
+    for i = 1, #keyword do
+        data[k] = string.byte(keyword, i)
+        k = k + 1
+    end
+    data[k] = 0x00
+    k = k + 1
+    for i = 1, #value do
+        data[k] = string.byte(value, i)
+        k = k + 1
+    end
+
+    local len = #data
+    local chunk = {}
+    local j = 1
+
+    pack32(len, chunk, j); j = j + 4
+    for i = 1, 4 do
+        chunk[j] = TEXT[i]; j = j + 1
+    end
+    for i = 1, len do
+        chunk[j] = data[i]; j = j + 1
+    end
+
+    ctx.crc_val = 0
+    ctx:crc32(chunk, 5, 4 + len)
+    pack32(ctx.crc_val, chunk, j)
+    j = j + 4
+
+    ctx.crc_val = 0
+    ctx:writeBytes(chunk, 1, j - 1)
+end
+
 
 ---Writes bytes to the output buffer
----@param data userdata|table The data to write
----@param index number|nil The index of the first byte to write
----@param len number|nil The number of bytes to write
-function Png:writeBytes(data, index, len)
-    index = index or 1
-    len = len or #data
+---@param src userdata|table The data to write
+---@param start number|nil The index of the first byte to write
+---@param size number|nil The number of bytes to write
+function PNG:writeBytes(src, start, size)
+    start = start or 1
+    size = size or #src
 
-    local output = self.output
-    local buffer = self.write_buffer
-    local buffer_pos = self.buffer_pos
+    local out = self.chunks
+    local buf = self.w_buf
+    local ptr = self.w_ptr
 
-    if type(data) == "table" then
-        local end_idx = index + len - 1
-        local i = index
+    if type(src) == "table" then
+        local stop = start + size - 1
+        local i = start
 
-        while i <= end_idx do
-            local available_buffer = WRITE_BUFFER_SIZE - buffer_pos
-            local chunk_size = min(available_buffer, end_idx - i + 1)
+        while i <= stop do
+            local space = IO_CHUNK - ptr
+            local step = m_min(space, stop - i + 1)
 
-            for j = 0, chunk_size - 1 do
-                buffer[buffer_pos + j] = data[i + j]
+            for j = 0, step - 1 do
+                buf[ptr + j] = src[i + j]
             end
 
-            buffer_pos = buffer_pos + chunk_size
-            i = i + chunk_size
+            ptr = ptr + step
+            i = i + step
 
-            if buffer_pos >= WRITE_BUFFER_SIZE or i > end_idx then
-                output[#output + 1] = ffi.string(buffer, buffer_pos)
-                buffer_pos = 0
+            if ptr >= IO_CHUNK or i > stop then
+                out[#out + 1] = ffi.string(buf, ptr)
+                ptr = 0
             end
         end
     else
-        output[#output + 1] = ffi.string(ffi_cast("uint8_t*", data) + index - 1, len)
+        out[#out + 1] = ffi.string(f_cast("uint8_t*", src) + start - 1, size)
     end
 
-    self.buffer_pos = buffer_pos
+    self.w_ptr = ptr
 end
 
 ---Initializes the CRC
-function Png:initCrc()
-    self.crc = 0xFFFFFFFF
+function PNG:initCrc()
+    self.crc_val = 0xFFFFFFFF
 end
 
 ---Updates the CRC
----@param data userdata|table The data to update the CRC with
----@param index number|nil The index of the first byte to update
----@param len number|nil The number of bytes to update
-function Png:crc32(data, index, len)
-    local crc = self.crc
+---@param src userdata|table The data to update the CRC with
+---@param start number|nil The index of the first byte to update
+---@param size number|nil The number of bytes to update
+function PNG:crc32(src, start, size)
+    local crc = self.crc_val
 
-    if type(data) == "table" then
-        local end_idx = index + len - 1
-        local i = index
+    if type(src) == "table" then
+        local stop = start + size - 1
+        local i = start
 
-        while i <= end_idx - 15 do
+        while i <= stop - 15 do
             for j = 0, 15 do
-                crc = bxor(rshift(crc, 8), crc_table[band(bxor(crc, data[i + j]), 0xFF)])
+                crc = b_xor(b_shr(crc, 8), CRC_LOOKUP[b_and(b_xor(crc, src[i + j]), 0xFF)])
             end
             i = i + 16
         end
 
-        while i <= end_idx do
-            crc = bxor(rshift(crc, 8), crc_table[band(bxor(crc, data[i]), 0xFF)])
+        while i <= stop do
+            crc = b_xor(b_shr(crc, 8), CRC_LOOKUP[b_and(b_xor(crc, src[i]), 0xFF)])
             i = i + 1
         end
     else
-        local ptr = ffi_cast("uint8_t*", data) + index - 1
-        for i = 0, len - 1 do
-            crc = bxor(rshift(crc, 8), crc_table[band(bxor(crc, ptr[i]), 0xFF)])
+        local p = f_cast("uint8_t*", src) + start - 1
+        for i = 0, size - 1 do
+            crc = b_xor(b_shr(crc, 8), CRC_LOOKUP[b_and(b_xor(crc, p[i]), 0xFF)])
         end
     end
 
-    self.crc = bnot(crc)
+    self.crc_val = b_not(crc)
 end
 
 ---Finalizes the CRC, returning the result
-function Png:finalizeCrc()
-    return self.crc
+function PNG:finalizeCrc()
+    return self.crc_val
 end
 
 ---Updates the Adler32
----@param data userdata|table The data to update the Adler32 with
----@param index number|nil The index of the first byte to update
----@param len number|nil The number of bytes to update
-function Png:adler32(data, index, len)
-    local s1 = band(self.adler, 0xFFFF)
-    local s2 = rshift(self.adler, 16)
+---@param src userdata|table The data to update the Adler32 with
+---@param start number|nil The index of the first byte to update
+---@param size number|nil The number of bytes to update
+function PNG:adler32(src, start, size)
+    local s1 = b_and(self.adler_val, 0xFFFF)
+    local s2 = b_shr(self.adler_val, 16)
 
-    if type(data) == "table" then
-        local pos = index
-        local remaining = len
+    if type(src) == "table" then
+        local p = start
+        local left = size
 
-        while remaining > 0 do
-            local current_chunk = min(5552, remaining)
-            local end_pos = pos + current_chunk - 1
+        while left > 0 do
+            local batch = m_min(5552, left)
+            local stop = p + batch - 1
 
-            local i = pos
-            while i <= end_pos - 7 do
-                local sum = data[i] + data[i + 1] + data[i + 2] + data[i + 3] +
-                    data[i + 4] + data[i + 5] + data[i + 6] + data[i + 7]
-                s1 = s1 + sum
-                s2 = s2 + s1 * 8 - (data[i] * 7 + data[i + 1] * 6 + data[i + 2] * 5 +
-                    data[i + 3] * 4 + data[i + 4] * 3 + data[i + 5] * 2 + data[i + 6])
+            local i = p
+            while i <= stop - 7 do
+                local s = src[i] + src[i + 1] + src[i + 2] + src[i + 3] +
+                    src[i + 4] + src[i + 5] + src[i + 6] + src[i + 7]
+                s1 = s1 + s
+                s2 = s2 + s1 * 8 - (src[i] * 7 + src[i + 1] * 6 + src[i + 2] * 5 +
+                    src[i + 3] * 4 + src[i + 4] * 3 + src[i + 5] * 2 + src[i + 6])
                 i = i + 8
             end
 
-            while i <= end_pos do
-                s1 = s1 + data[i]
+            while i <= stop do
+                s1 = s1 + src[i]
                 s2 = s2 + s1
                 i = i + 1
             end
@@ -148,96 +191,96 @@ function Png:adler32(data, index, len)
             s1 = s1 % 65521
             s2 = s2 % 65521
 
-            pos = end_pos + 1
-            remaining = remaining - current_chunk
+            p = stop + 1
+            left = left - batch
         end
     else
-        local ptr = ffi_cast("uint8_t*", data) + index - 1
-        for i = 0, len - 1 do
+        local ptr = f_cast("uint8_t*", src) + start - 1
+        for i = 0, size - 1 do
             s1 = (s1 + ptr[i]) % 65521
             s2 = (s2 + s1) % 65521
         end
     end
 
-    self.adler = bor(lshift(s2, 16), s1)
+    self.adler_val = b_or(b_shl(s2, 16), s1)
 end
 
 ---Writes pixels to the PNG file
----@param pixels table The pixels to write
-function Png:write(pixels)
-    local count = #pixels
-    local pixelPointer = 1
-    local lineSize = self.lineSize
-    local uncompRemain = self.uncompRemain
-    local deflateFilled = self.deflateFilled
-    local positionX = self.positionX
-    local positionY = self.positionY
-    local height = self.height
+---@param pix table The pixels to write
+function PNG:write(pix)
+    local left = #pix
+    local p_idx = 1
+    local stride = self.stride
+    local r_cnt = self.rem_sz
+    local f_cnt = self.fill_sz
+    local px = self.pos_x
+    local py = self.pos_y
+    local h = self.h
 
-    local filterByte = self.filterByte or { 0 }
-    local header = self.header_buffer or {}
-    self.filterByte = filterByte
-    self.header_buffer = header
+    local f_b = self.filter_b or { 0 }
+    local h_b = self.head_b or {}
+    self.filter_b = f_b
+    self.head_b = h_b
 
-    while count > 0 and not self.done do
-        if deflateFilled == 0 then
-            local size = min(DEFLATE_MAX_BLOCK_SIZE, uncompRemain)
-            local isLast = (uncompRemain <= DEFLATE_MAX_BLOCK_SIZE) and 1 or 0
+    while left > 0 and not self.finished do
+        if f_cnt == 0 then
+            local sz = m_min(MAX_BLOCK, r_cnt)
+            local last = (r_cnt <= MAX_BLOCK) and 1 or 0
 
-            header[1] = band(isLast, 0xFF)
-            header[2] = band(size, 0xFF)
-            header[3] = band(rshift(size, 8), 0xFF)
-            header[4] = band(bxor(size, 0xFFFF), 0xFF)
-            header[5] = band(rshift(bxor(size, 0xFFFF), 8), 0xFF)
+            h_b[1] = b_and(last, 0xFF)
+            h_b[2] = b_and(sz, 0xFF)
+            h_b[3] = b_and(b_shr(sz, 8), 0xFF)
+            h_b[4] = b_and(b_xor(sz, 0xFFFF), 0xFF)
+            h_b[5] = b_and(b_shr(b_xor(sz, 0xFFFF), 8), 0xFF)
 
-            self:writeBytes(header, 1, 5)
-            self:crc32(header, 1, 5)
+            self:writeBytes(h_b, 1, 5)
+            self:crc32(h_b, 1, 5)
         end
 
-        if positionX == 0 then
-            self:writeBytes(filterByte)
-            self:crc32(filterByte, 1, 1)
-            self:adler32(filterByte, 1, 1)
-            positionX = 1
-            uncompRemain = uncompRemain - 1
-            deflateFilled = deflateFilled + 1
+        if px == 0 then
+            self:writeBytes(f_b)
+            self:crc32(f_b, 1, 1)
+            self:adler32(f_b, 1, 1)
+            px = 1
+            r_cnt = r_cnt - 1
+            f_cnt = f_cnt + 1
         else
-            local n = min(
-                DEFLATE_MAX_BLOCK_SIZE - deflateFilled,
-                lineSize - positionX,
-                count
+            local n = m_min(
+                MAX_BLOCK - f_cnt,
+                stride - px,
+                left
             )
 
-            self:writeBytes(pixels, pixelPointer, n)
-            self:crc32(pixels, pixelPointer, n)
-            self:adler32(pixels, pixelPointer, n)
+            self:writeBytes(pix, p_idx, n)
+            self:crc32(pix, p_idx, n)
+            self:adler32(pix, p_idx, n)
 
-            count = count - n
-            pixelPointer = pixelPointer + n
-            positionX = positionX + n
-            uncompRemain = uncompRemain - n
-            deflateFilled = deflateFilled + n
+            left = left - n
+            p_idx = p_idx + n
+            px = px + n
+            r_cnt = r_cnt - n
+            f_cnt = f_cnt + n
         end
 
-        if deflateFilled >= DEFLATE_MAX_BLOCK_SIZE then
-            deflateFilled = 0
+        if f_cnt >= MAX_BLOCK then
+            f_cnt = 0
         end
 
-        if positionX == lineSize then
-            positionX = 0
-            positionY = positionY + 1
+        if px == stride then
+            px = 0
+            py = py + 1
 
-            if positionY == height then
-                if self.buffer_pos > 0 then
-                    local output = self.output
-                    output[#output + 1] = ffi.string(self.write_buffer, self.buffer_pos)
+            if py == h then
+                if self.w_ptr > 0 then
+                    local chunks = self.chunks
+                    chunks[#chunks + 1] = ffi.string(self.w_buf, self.w_ptr)
                 end
 
-                local footer = self.footer_buffer or {}
-                putBigUint32(self.adler, footer, 1)
+                local footer = self.foot_b or {}
+                pack32(self.adler_val, footer, 1)
                 self:crc32(footer, 1, 4)
-                local final_crc = self:finalizeCrc()
-                putBigUint32(final_crc, footer, 5)
+                local final = self:finalizeCrc()
+                pack32(final, footer, 5)
 
                 footer[9] = 0x00; footer[10] = 0x00; footer[11] = 0x00; footer[12] = 0x00
                 footer[13] = 0x49; footer[14] = 0x45; footer[15] = 0x4E; footer[16] = 0x44
@@ -246,121 +289,127 @@ function Png:write(pixels)
                 self:writeBytes(footer, 1, 8)
                 self:writeBytes(footer, 9, 12)
 
-                self.footer_buffer = footer
-                self.done = true
+                self.foot_b = footer
+                self.finished = true
                 break
             end
         end
     end
 
-    self.uncompRemain = uncompRemain
-    self.deflateFilled = deflateFilled
-    self.positionX = positionX
-    self.positionY = positionY
+    self.rem_sz = r_cnt
+    self.fill_sz = f_cnt
+    self.pos_x = px
+    self.pos_y = py
 end
 
-local PNG_SIGNATURE = ffi.new("uint8_t[8]", { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A })
-local IHDR_TYPE = ffi.new("uint8_t[4]", { 0x49, 0x48, 0x44, 0x52 })
-local IDAT_TYPE = ffi.new("uint8_t[4]", { 0x49, 0x44, 0x41, 0x54 })
-local DEFLATE_HEADER = ffi.new("uint8_t[2]", { 0x08, 0x1D })
+local SIG = ffi.new("uint8_t[8]", { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A })
+local IHDR = ffi.new("uint8_t[4]", { 0x49, 0x48, 0x44, 0x52 })
+local IDAT = ffi.new("uint8_t[4]", { 0x49, 0x44, 0x41, 0x54 })
+local ZLIB = ffi.new("uint8_t[2]", { 0x08, 0x1D })
 
-local function begin(width, height, colorMode)
-    colorMode = colorMode or "rgb"
+local function create(w, h, mode, signature)
+    mode = mode or "rgb"
 
-    local bytesPerPixel, colorType
-    if colorMode == "rgb" then
-        bytesPerPixel, colorType = 3, 2
-    elseif colorMode == "rgba" then
-        bytesPerPixel, colorType = 4, 6
+    local bpp, ctype
+    if mode == "rgb" then
+        bpp, ctype = 3, 2
+    elseif mode == "rgba" then
+        bpp, ctype = 4, 6
     else
-        error("Invalid colorMode: " .. tostring(colorMode))
+        error("Invalid mode: " .. tostring(mode))
     end
 
-    local state = setmetatable({
-        width = width,
-        height = height,
-        done = false,
-        output = {},
-        lineSize = width * bytesPerPixel + 1,
-        positionX = 0,
-        positionY = 0,
-        deflateFilled = 0,
-        crc = 0,
-        adler = 1,
+    local ctx = setmetatable({
+        w = w,
+        h = h,
+        finished = false,
+        chunks = {},
+        stride = w * bpp + 1,
+        pos_x = 0,
+        pos_y = 0,
+        fill_sz = 0,
+        crc_val = 0,
+        adler_val = 1,
 
-        write_buffer = ffi.new("uint8_t[?]", WRITE_BUFFER_SIZE),
-        buffer_pos = 0,
-    }, Png)
+        w_buf = ffi.new("uint8_t[?]", IO_CHUNK),
+        w_ptr = 0,
+    }, PNG)
 
-    state.uncompRemain = state.lineSize * height
-    local numBlocks = ceil(state.uncompRemain / DEFLATE_MAX_BLOCK_SIZE)
-    local idatSize = numBlocks * 5 + 6 + state.uncompRemain
+    ctx.rem_sz = ctx.stride * h
+    local blocks = m_ceil(ctx.rem_sz / MAX_BLOCK)
+    local idat_sz = blocks * 5 + 6 + ctx.rem_sz
 
-    local header = {}
-    local idx = 1
+    local head = {}
+    local k = 1
 
     for i = 0, 7 do
-        header[idx] = PNG_SIGNATURE[i]
-        idx = idx + 1
+        head[k] = SIG[i]
+        k = k + 1
     end
 
-    putBigUint32(13, header, idx)
-    idx = idx + 4
+    pack32(13, head, k)
+    k = k + 4
 
     for i = 0, 3 do
-        header[idx] = IHDR_TYPE[i]
-        idx = idx + 1
+        head[k] = IHDR[i]
+        k = k + 1
     end
 
-    putBigUint32(width, header, idx)
-    idx = idx + 4
-    putBigUint32(height, header, idx)
-    idx = idx + 4
+    pack32(w, head, k)
+    k = k + 4
+    pack32(h, head, k)
+    k = k + 4
 
-    header[idx] = 8
-    header[idx + 1] = colorType
-    header[idx + 2] = 0
-    header[idx + 3] = 0
-    header[idx + 4] = 0
-    idx = idx + 5
+    head[k] = 8
+    head[k + 1] = ctype
+    head[k + 2] = 0
+    head[k + 3] = 0
+    head[k + 4] = 0
+    k = k + 5
 
-    state:initCrc()
-    state:crc32(header, 13, 17)
-    local ihdr_crc = state:finalizeCrc()
+    ctx:initCrc()
+    ctx:crc32(head, 13, 17)
+    local ihdr_crc = ctx:finalizeCrc()
 
-    putBigUint32(ihdr_crc, header, idx)
-    idx = idx + 4
+    pack32(ihdr_crc, head, k)
+    k = k + 4
 
-    putBigUint32(idatSize, header, idx)
-    idx = idx + 4
+    ctx:writeBytes(head, 1, k - 1)
+    writeTextChunk(ctx, "signature", signature)
+
+    local idat_start = {}
+    k = 1
+    pack32(idat_sz, idat_start, k)
+    k = k + 4
 
     for i = 0, 3 do
-        header[idx] = IDAT_TYPE[i]
-        idx = idx + 1
+        idat_start[k] = IDAT[i]
+        k = k + 1
     end
 
-    header[idx] = DEFLATE_HEADER[0]
-    header[idx + 1] = DEFLATE_HEADER[1]
+    idat_start[k] = ZLIB[0]
+    idat_start[k + 1] = ZLIB[1]
+    k = k + 2
 
-    state:writeBytes(header)
+    ctx:writeBytes(idat_start, 1, k - 1)
 
-    state:initCrc()
-    state:crc32(header, idx - 4, 6)
+    ctx:initCrc()
+    ctx:crc32(idat_start, 5, 6)
 
-    return state
+    return ctx
 end
 
 ---Returns the PNG data to be written to a file
-function Png:getData()
-    return table.concat(self.output)
+function PNG:getData()
+    return table.concat(self.chunks)
 end
 
----Creates a new Png object
----@param width number
----@param height number
----@param colorMode string One of "rgb" or "rgba"
-function Png.new(width, height, colorMode)
-    return begin(width, height, colorMode)
+---Creates a new PNG object
+---@param w number
+---@param h number
+---@param mode string One of "rgb" or "rgba"
+function PNG.new(w, h, mode, signature)
+    return create(w, h, mode, signature)
 end
 
-return begin
+return create

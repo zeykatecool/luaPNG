@@ -1,4 +1,4 @@
-local Image = require("luaPNG.main")
+local Image = require("luaPNG.init")
 
 local width, height = 512, 512
 local png = Image.new(width, height, "rgb")
