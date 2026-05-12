@@ -65,12 +65,11 @@ local function writeTextChunk(ctx, keyword, value)
         chunk[j] = data[i]; j = j + 1
     end
 
-    ctx.crc_val = 0
+    ctx:initCrc()
     ctx:crc32(chunk, 5, 4 + len)
     pack32(ctx.crc_val, chunk, j)
     j = j + 4
 
-    ctx.crc_val = 0
     ctx:writeBytes(chunk, 1, j - 1)
 end
 
@@ -320,7 +319,7 @@ local IHDR = ffi.new("uint8_t[4]", { 0x49, 0x48, 0x44, 0x52 })
 local IDAT = ffi.new("uint8_t[4]", { 0x49, 0x44, 0x41, 0x54 })
 local ZLIB = ffi.new("uint8_t[2]", { 0x08, 0x1D })
 
-local function create(w, h, mode, signature)
+local function create(w, h, mode, metadata)
     mode = mode or "rgb"
 
     local bpp, ctype
@@ -388,7 +387,11 @@ local function create(w, h, mode, signature)
     k = k + 4
 
     ctx:writeBytes(head, 1, k - 1)
-    writeTextChunk(ctx, "signature", signature)
+    if metadata then
+        for u, v in pairs(metadata) do
+            writeTextChunk(ctx, u, v)
+        end
+    end
 
     local idat_start = {}
     k = 1
@@ -421,8 +424,8 @@ end
 ---@param w number
 ---@param h number
 ---@param mode string One of "rgb" or "rgba"
-function PNG.new(w, h, mode, signature)
-    return create(w, h, mode, signature)
+function PNG.new(w, h, mode, metadata)
+    return create(w, h, mode, metadata)
 end
 
 return create

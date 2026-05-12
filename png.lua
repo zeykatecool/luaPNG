@@ -70,7 +70,6 @@ local function writeTextChunk(ctx, keyword, value)
     pack32(ctx.crc_val, chunk, j)
     j = j + 4
 
-    ctx.crc_val = 0
     ctx:writeBytes(chunk, 1, j - 1)
 end
 
@@ -272,7 +271,7 @@ local IHDR = { 0x49, 0x48, 0x44, 0x52 }
 local IDAT = { 0x49, 0x44, 0x41, 0x54 }
 local ZLIB = { 0x08, 0x1D }
 
-local function create(w, h, mode, signature)
+local function create(w, h, mode, metadata)
     mode = mode or "rgb"
 
     local bpp, ctype
@@ -358,7 +357,11 @@ local function create(w, h, mode, signature)
     ctx:crc32(head, 13, 17)
     pack32(ctx.crc_val, head, 30)
     ctx:writeBytes(head, 1, 33)
-    writeTextChunk(ctx, "signature", signature)
+    if metadata then
+        for u, v in pairs(metadata) do
+            writeTextChunk(ctx, u, v)
+        end
+    end
     ctx:writeBytes(head, 34, 10)
     ctx.crc_val = 0
     ctx:crc32(head, 38, 6)

@@ -368,13 +368,20 @@ function ImageMethods:write(Pixels)
     return true
 end
 
-function ImageMethods:addSignature(Signature)
-    self.Signature = Signature
+function ImageMethods:addMetadata(key, value)
+    self.Metadata = self.Metadata or {}
+    if type(key) == "table" then
+        for k, v in pairs(key) do
+            self.Metadata[k] = v
+        end
+    else
+        self.Metadata[key] = value
+    end
     return self
 end
 
 function ImageMethods:save(Path)
-    local PNG = PNGLib(self.Width, self.Height, self.ColorMode, self.Signature)
+    local PNG = PNGLib(self.Width, self.Height, self.ColorMode, self.Metadata)
     PNG:write(self.Data)
     local File = io.open(Path, "wb") or error("Failed to open file while saving image.")
     File:write(PNG:getData())
