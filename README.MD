@@ -6,6 +6,11 @@
 - Only requires `bit` library.
 - This library does **not** perform any **compression**. Output files are uncompressed PNGs.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/zeykatecool/luaPNG/refs/heads/main/benchmarks/benchmark_time.png" width="400">
+  <img src="https://raw.githubusercontent.com/zeykatecool/luaPNG/refs/heads/main/benchmarks/benchmark_throughput.png" width="400">
+</p>
+
 # Usage
 - Check `examples` folder for more examples.
 > `luaPNG` selects the default runner based on `(require("luaPNG.init")).UsingJIT` variable.
