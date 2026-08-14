@@ -16,9 +16,11 @@ description = {
 }
 build = {
   type = "builtin",
-  modules = {
-    ffipng = "ffipng.lua",
-    png = "png.lua",
+ modules = {
+    ["luaPNG.init"] = "init.lua",
+    ["luaPNG.geometry"] = "geometry.lua",
+    ["luaPNG.ffipng"] = "ffipng.lua",
+    ["luaPNG.png"] = "png.lua",
   }
 }
 dependencies = {

@@ -1,19 +1,23 @@
-# PNG Encoder and Raster Toolkit for Lua / LuaJIT
-- High-performance PNG encoder written in pure Lua with optional LuaJIT FFI backend.
-> LuaJIT is much faster and Lua is not recommended for production usage.
+# PNG Encoder and Raster Toolkit for LuaJIT / Lua
+- High-performance PNG encoder for LuaJIT and Lua.
+- LuaJIT is much faster and ~~Lua is not recommended for production usage~~ **Lua (png.lua) is deprecated**.
 - Provides a lightweight raster pipeline (geometry, shapes).
 - Supports RGB and RGBA color modes.
-- Only requires `bit` library.
 - This library does **not** perform any **compression**. Output files are uncompressed PNGs.
 
+# Performance
+- Check `benchmarks` for graphics (requires [luachart](https://github.com/zeykatecool/luachart) to generate charts).
 <p align="center">
-  <img src="https://raw.githubusercontent.com/zeykatecool/luaPNG/refs/heads/main/benchmarks/benchmark_time.png" width="400">
-  <img src="https://raw.githubusercontent.com/zeykatecool/luaPNG/refs/heads/main/benchmarks/benchmark_throughput.png" width="400">
+  <img src="https://raw.githubusercontent.com/zeykatecool/luaPNG/main/benchmarks/chart_io_throughput.png" width="45%">
+  <img src="https://raw.githubusercontent.com/zeykatecool/luaPNG/main/benchmarks/chart_latency_stability.png" width="45%">
+  <br>
+  <img src="https://raw.githubusercontent.com/zeykatecool/luaPNG/main/benchmarks/chart_normalized_efficiency.png" width="45%">
+  <img src="https://raw.githubusercontent.com/zeykatecool/luaPNG/main/benchmarks/chart_percentage_breakdown.png" width="45%">
 </p>
 
 # Usage
 - Check `examples` folder for more examples.
-> `luaPNG` selects the default runner based on `(require("luaPNG.init")).UsingJIT` variable.
+
 ```lua
 --- Encoding standart PNG.
 local Image = require("luaPNG.init")
@@ -46,14 +50,6 @@ img:add(Geometry.Rectangle{
 img:save("Example800x600.png")
 print("Done in:", os.clock())
 ```
-
-# Benchmark
-- You can run `benchmark/pure_lua_benchmark.lua` and `benchmark/ffipng_benchmark.lua` files to run the benchmark.
-> It will give CSV file in `benchmark/output/*` folder.
-
-## Known Issues
-### png.lua
-- `png.lua` slows down or crashes when encoding large RGBA images.
 
 ## License
 - MIT License

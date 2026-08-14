@@ -1,4 +1,5 @@
 --png.lua
+-- deprecated,so slow anyway,not recommended to use
 local PNG = {}
 PNG.__index = PNG
 
