@@ -9,7 +9,7 @@ description = {
   detailed = [[
     Provides two modules:
     - ffipng.lua: Fast PNG encoder using LuaJIT FFI.
-    - png.lua: Pure Lua PNG encoder (bit dependency only).
+    - png.lua: DEPRECATED Pure Lua PNG encoder (bit dependency only). DEPRECATED
   ]],
   homepage = "https://github.com/zeykatecool/luaPNG",
   license = "MIT"
